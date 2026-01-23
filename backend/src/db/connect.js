@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import { DB_NAME } from '../constants.js';
 
-const connect = async() => {
+const connect = async () => {
     try {
         const connectionInstance = await mongoose.connect(`${process.env.MONGOURI}/${DB_NAME}`);
         console.log(`Mongo Connected Successfully. \ndatavase Host: ${connectionInstance.connection.host}`);
@@ -11,4 +11,4 @@ const connect = async() => {
     }
 }
 
-export {connect}
+export { connect }
