@@ -10,10 +10,11 @@ export const downloadFile = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Filename is required");
     }
 
-    const filePath = path.join(process.cwd(), 'public', 'temp', filename);
+    const safeFilename = path.basename(filename);
+    const filePath = path.join(process.cwd(), "public", "temp", safeFilename);
 
     if (fs.existsSync(filePath)) {
-        res.download(filePath, filename, (err) => {
+        res.download(filePath, safeFilename, (err) => {
             if (err) {
                 // Header might be sent if download fails mid-stream, but asyncHandler handles errors usually.
                 // If headers are sent, we can't send error response.
