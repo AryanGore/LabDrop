@@ -3,6 +3,6 @@ import { downloadFile } from '../controllers/filedownload.controller.js';
 
 const router = express.Router();
 
-router.get('/download/:filename', downloadFile);
+router.get('/:filename', downloadFile);
 
 export default router;
