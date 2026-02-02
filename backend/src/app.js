@@ -6,6 +6,7 @@ import uploadRouter from './routes/fileupload.route.js';
 import downloadRouter from './routes/filedownload.route.js';
 // import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
+import folderRouter from './routes/folder.route.js';
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.use('/download', downloadRouter);
 // app.use('/user', userRouter);
 
 app.use('/api/v1/auth', authRouter);
-
+app.use('/api/v1/folder', folderRouter);
 // global error handler
 app.use(errorHandler);
 
