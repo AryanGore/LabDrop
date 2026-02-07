@@ -1,29 +1,35 @@
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { File } from "../models/file.model.js";
 import path from 'path';
 import fs from 'fs';
 
 export const downloadFile = asyncHandler(async (req, res) => {
-    const { filename } = req.params;
+    const { fileId } = req.params;
+    const userId = req.user?._id;
 
-    if (!filename) {
-        throw new ApiError(400, "Filename is required");
+    if (!fileId) {
+        throw new ApiError(400, "File ID is required");
     }
 
-    const safeFilename = path.basename(filename);
-    const filePath = path.join(process.cwd(), "public", "temp", safeFilename);
+    const file = await File.findOne({ _id: fileId, ownerId: userId });
 
-    if (fs.existsSync(filePath)) {
-        res.download(filePath, safeFilename, (err) => {
+    if (!file) {
+        throw new ApiError(404, "File not found or access denied.");
+    }
+
+    // Safety check: ensure file exists on disk
+    if (fs.existsSync(file.storageKey)) {
+        res.download(file.storageKey, file.name, (err) => {
             if (err) {
-                // Header might be sent if download fails mid-stream, but asyncHandler handles errors usually.
-                // If headers are sent, we can't send error response.
+                console.error("Download Error:", err);
                 if (!res.headersSent) {
                     throw new ApiError(500, "Error downloading file");
                 }
             }
         });
     } else {
-        throw new ApiError(404, "File not found");
+        // Fallback or error if physical file is missing but DB record exists
+        throw new ApiError(404, "Physical file not found.");
     }
 });
