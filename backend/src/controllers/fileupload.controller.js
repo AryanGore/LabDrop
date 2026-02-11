@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { File } from "../models/file.model.js";
 import { Folder } from "../models/folder.model.js";
+import { uploadOnCloudinary } from '../utils/cloudinary.config.js'
 
 export const fileupload = asyncHandler(async (req, res) => {
     let { folderId } = req.body;
@@ -30,6 +31,15 @@ export const fileupload = asyncHandler(async (req, res) => {
         const parts = pathStr.split('/').filter(p => p && p !== "." && p !== "..");
         let currentParentId = startFolderId;
 
+        let currentPath;
+        if (startFolderId === null) currentPath = "/"
+        else {
+            const foundFolder = await Folder.findById(startFolderId);
+            if (!foundFolder) throw new ApiError(404, "Folder Not Found");
+
+            currentPath = foundFolder.path + foundFolder.name + "/"
+        }
+
         for (const part of parts) {
             // Try to find existing folder
             let folder = await Folder.findOne({
@@ -45,9 +55,10 @@ export const fileupload = asyncHandler(async (req, res) => {
                     name: part,
                     owner: userId,
                     parentFolder: currentParentId,
-                    path: "/" // TODO: Dynamically construct path string if needed for optimization
+                    path: currentPath // TODO: Dynamically construct path string if needed for optimization,(DONE).
                 });
             }
+            currentPath = folder.path + folder.name + "/"
             currentParentId = folder._id;
         }
         return currentParentId;
@@ -55,42 +66,61 @@ export const fileupload = asyncHandler(async (req, res) => {
 
     const createdFiles = [];
 
-    // Process files sequentially to maintain folder integrity
-    // (Optimization: We could group by folder path, but sequential is safer for now)
-    for (let i = 0; i < req.files.length; i++) {
-        const file = req.files[i];
-        const relativePath = paths[i] || file.originalname;
-        const directoryPath = relativePath.includes('/') ? path.dirname(relativePath) : "";
+    try {
+        // Process files sequentially to maintain folder integrity
+        for (let i = 0; i < req.files.length; i++) {
+            const file = req.files[i];
 
-        // Find or create the target folder for this file
-        const targetFolderId = await ensureDirectory(folderId || null, directoryPath);
+            const cloudResponse = await uploadOnCloudinary(file.path);
+            if (!cloudResponse) throw new ApiError(500, "Failed to upload file to cloudinary");
 
-        // Create File document
-        const newFile = await File.create({
-            ownerId: userId,
-            folderId: targetFolderId,
-            name: file.originalname,
-            size: file.size,
-            mimeType: file.mimetype,
-            storageKey: file.path, // Local path
-            status: "ACTIVE"
-        });
+            const relativePath = paths[i] || file.originalname;
+            const directoryPath = relativePath.includes('/') ? path.dirname(relativePath) : "";
 
-        // Link file to folder
-        if (targetFolderId) {
-            await Folder.findByIdAndUpdate(targetFolderId, {
-                $push: { files: newFile._id }
+            // Find or create the target folder for this file
+            const targetFolderId = await ensureDirectory(folderId || null, directoryPath);
+
+            // Create File document
+            const newFile = await File.create({
+                ownerId: userId,
+                folderId: targetFolderId,
+                name: file.originalname,
+                size: file.size,
+                mimeType: file.mimetype,
+                storageKey: cloudResponse.secure_url,
+                status: "ACTIVE"
             });
+
+            // Link file to folder
+            if (targetFolderId) {
+                await Folder.findByIdAndUpdate(targetFolderId, {
+                    $push: { files: newFile._id }
+                });
+            }
+
+            createdFiles.push(newFile);
         }
 
-        createdFiles.push(newFile);
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                { files: createdFiles },
+                "Files uploaded and processed successfully."
+            )
+        );
+    } catch (error) {
+        // Cleanup: Delete any files that Multer saved but weren't processed/deleted by Cloudinary utility
+        if (req.files) {
+            req.files.forEach(file => {
+                if (fs.existsSync(file.path)) {
+                    try {
+                        fs.unlinkSync(file.path);
+                    } catch (unlinkError) {
+                        console.error("Cleanup Error:", unlinkError);
+                    }
+                }
+            });
+        }
+        throw error; // Re-throw to let asyncHandler handle the ApiError
     }
-
-    return res.status(200).json(
-        new ApiResponse(
-            200,
-            { files: createdFiles },
-            "Files uploaded and processed successfully."
-        )
-    );
 });
