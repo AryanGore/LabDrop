@@ -1,0 +1,8 @@
+{
+    "ignore": [
+        "public/temp/*",
+        "test.txt",
+        "project/*",
+        "cookies.txt"
+    ]
+}
