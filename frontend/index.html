@@ -3,11 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="description" content="LabDrop - Secure file management and storage solution for teams. Upload, organize, and share files with ease." />
+    <meta name="keywords" content="file manager, cloud storage, document management, team collaboration" />
+    <meta name="author" content="LabDrop Team" />
+    <meta name="theme-color" content="#9333ea" />
+    <meta property="og:title" content="LabDrop - File Manager" />
+    <meta property="og:description" content="Secure file management and storage solution for teams" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LabDrop - File Manager" />
+    <meta name="twitter:description" content="Secure file management and storage solution for teams" />
+    
+    <!-- Preconnect to external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Apple specific -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LabDrop" />
+    
+    <!-- Security headers -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'" />
+    
+    <title>LabDrop - Secure File Manager</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Loading fallback -->
+    <noscript>
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background: linear-gradient(to bottom right, #f3e8ff, #dbeafe);
+      ">
+        <div style="text-align: center;">
+          <h1 style="color: #1f2937; margin-bottom: 10px;">LabDrop</h1>
+          <p style="color: #6b7280;">JavaScript is required to run this application.</p>
+        </div>
+      </div>
+    </noscript>
   </body>
 </html>
