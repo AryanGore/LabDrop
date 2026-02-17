@@ -30,7 +30,7 @@ function Login() {
 
     try {
       await login(formData.email, formData.password)
-      navigate('/')
+      navigate('/dashboard')
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.')
       setLoading(false)
