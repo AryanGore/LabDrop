@@ -137,12 +137,12 @@ const Landing = () => {
     const getWordStyle = (word) => {
         const cleanWord = word.replace(/[.,]/g, ''); // Remove punctuation for checking
         if (solutionKeywords.includes(cleanWord)) {
-            return "text-cyan-400 font-medium drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer";
+            return "text-cyan-400 font-medium drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer hover:text-cyan-300 transition-colors duration-300";
         }
         if (problemKeywords.includes(cleanWord)) {
-            return "text-rose-300/90 font-medium decoration-rose-500/30 underline-offset-4 cursor-pointer";
+            return "text-rose-400 font-medium drop-shadow-[0_0_8px_rgba(251,113,133,0.5)] cursor-pointer hover:text-rose-300 transition-colors duration-300";
         }
-        return "text-slate-300";
+        return "text-slate-300 hover:text-white transition-colors duration-300";
     };
 
     const containerVariants = {
@@ -257,26 +257,51 @@ const Landing = () => {
                         </div>
 
                         {/* Interactive Project Description */}
-                        <motion.div
-                            className="bg-white/5 border border-white/5 rounded-2xl p-8 backdrop-blur-md shadow-inner group transition-all hover:bg-white/10 hover:border-white/10"
-                        >
-                            <motion.p
-                                variants={containerVariants}
-                                initial="hidden"
-                                animate="visible"
-                                className="leading-relaxed text-lg md:text-xl font-light flex flex-wrap gap-x-2 justify-center md:justify-start"
+                        <div className="relative group">
+                            <motion.div
+                                animate={{
+                                    scale: [1, 1.02, 1],
+                                    opacity: [0.5, 0.8, 0.5],
+                                }}
+                                transition={{
+                                    duration: 8,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                }}
+                                className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-teal-500/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition duration-500"
+                            />
+                            <motion.div
+                                className="relative bg-slate-900/40 border border-white/10 rounded-2xl p-8 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:border-white/20 hover:bg-slate-900/60 overflow-hidden"
                             >
-                                {descriptionText.split(" ").map((word, index) => (
-                                    <motion.span
-                                        key={index}
-                                        variants={wordVariants}
-                                        className={`inline-block transition-transform duration-200 hover:scale-110 ${getWordStyle(word)}`}
-                                    >
-                                        {word}
-                                    </motion.span>
-                                ))}
-                            </motion.p>
-                        </motion.div>
+                                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+                                <motion.p
+                                    variants={containerVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    className="leading-relaxed text-lg md:text-xl font-light flex flex-wrap gap-x-2 justify-center md:justify-start relative z-10"
+                                >
+                                    {descriptionText.split(" ").map((word, index) => (
+                                        <motion.span
+                                            key={index}
+                                            variants={wordVariants}
+                                            whileHover={{
+                                                y: -2,
+                                                scale: 1.05,
+                                                textShadow: "0 0 8px rgba(255,255,255,0.5)"
+                                            }}
+                                            className={`inline-block relative group/word ${getWordStyle(word)}`}
+                                        >
+                                            {word}
+                                            <span className={`absolute -bottom-1 left-0 w-0 h-[2px] transition-all duration-300 group-hover/word:w-full ${solutionKeywords.includes(word.replace(/[.,]/g, '')) ? 'bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]' :
+                                                    problemKeywords.includes(word.replace(/[.,]/g, '')) ? 'bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.8)]' :
+                                                        'bg-white/50'
+                                                }`} />
+                                        </motion.span>
+                                    ))}
+                                </motion.p>
+                            </motion.div>
+                        </div>
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
