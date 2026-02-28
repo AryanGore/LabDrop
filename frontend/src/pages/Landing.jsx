@@ -294,8 +294,8 @@ const Landing = () => {
                                         >
                                             {word}
                                             <span className={`absolute -bottom-1 left-0 w-0 h-[2px] transition-all duration-300 group-hover/word:w-full ${solutionKeywords.includes(word.replace(/[.,]/g, '')) ? 'bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]' :
-                                                    problemKeywords.includes(word.replace(/[.,]/g, '')) ? 'bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.8)]' :
-                                                        'bg-white/50'
+                                                problemKeywords.includes(word.replace(/[.,]/g, '')) ? 'bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.8)]' :
+                                                    'bg-white/50'
                                                 }`} />
                                         </motion.span>
                                     ))}
