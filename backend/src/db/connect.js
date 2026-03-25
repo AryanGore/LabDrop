@@ -7,7 +7,7 @@ const connect = async () => {
         console.log(`Mongo Connected Successfully. \ndatavase Host: ${connectionInstance.connection.host}`);
     } catch (error) {
         console.log(`Mongo Connection Failed.`);
-        process.exit(1);
+        // process.exit(1);
     }
 }
 
