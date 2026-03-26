@@ -13,6 +13,10 @@ import fileManagementRouter from './routes/file.route.js';
 const app = express();
 
 // CORS configuration - allow frontend to communicate with backend
+const allowedOrigins = [
+    'https://labdrop-swart.vercel.app',
+];
+
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps, curl, postman)
@@ -20,6 +24,16 @@ app.use(cors({
 
         // Allow any localhost origin for development
         if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+            return callback(null, true);
+        }
+
+        // Allow deployed frontend origins
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        // Allow Vercel preview deployments
+        if (origin.endsWith('.vercel.app')) {
             return callback(null, true);
         }
 
@@ -33,6 +47,9 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
 // routes
+app.get('/', (req, res) => {
+    res.json({ status: 'ok', message: 'LabDrop API is running' });
+});
 app.use('/health', testRouter);
 app.use('/drop', uploadRouter);
 app.use('/download', downloadRouter);
