@@ -1,10 +1,10 @@
-version: '3.8'
-
 services:
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: dev
+    container_name: labdrop-frontend
     ports:
       - "5173:5173"
     volumes:
@@ -12,13 +12,18 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:8000
     depends_on:
-      - backend
+      backend:
+        condition: service_started
+    restart: unless-stopped
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: dev
+    container_name: labdrop-backend
     ports:
       - "8000:8000"
     volumes:
@@ -31,14 +36,24 @@ services:
     env_file:
       - ./backend/.env
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
 
   mongo:
     image: mongo:6
+    container_name: labdrop-mongo
     ports:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
 volumes:
   mongo-data:
