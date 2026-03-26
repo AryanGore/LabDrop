@@ -13,6 +13,10 @@ import fileManagementRouter from './routes/file.route.js';
 const app = express();
 
 // CORS configuration - allow frontend to communicate with backend
+const allowedOrigins = [
+    'https://labdrop-hhsv5vd9g-prathmeshjugatis-projects.vercel.app',
+];
+
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps, curl, postman)
@@ -20,6 +24,16 @@ app.use(cors({
 
         // Allow any localhost origin for development
         if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+            return callback(null, true);
+        }
+
+        // Allow deployed frontend origins
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        // Allow Vercel preview deployments
+        if (origin.endsWith('.vercel.app')) {
             return callback(null, true);
         }
 
