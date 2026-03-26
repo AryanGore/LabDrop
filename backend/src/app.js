@@ -14,7 +14,7 @@ const app = express();
 
 // CORS configuration - allow frontend to communicate with backend
 const allowedOrigins = [
-    'https://labdrop-hhsv5vd9g-prathmeshjugatis-projects.vercel.app',
+    'https://labdrop-swart.vercel.app/',
 ];
 
 app.use(cors({
