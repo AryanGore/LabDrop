@@ -14,7 +14,7 @@ const app = express();
 
 // CORS configuration - allow frontend to communicate with backend
 const allowedOrigins = [
-    'https://labdrop-swart.vercel.app/',
+    'https://labdrop-swart.vercel.app',
 ];
 
 app.use(cors({
@@ -47,6 +47,9 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
 // routes
+app.get('/', (req, res) => {
+    res.json({ status: 'ok', message: 'LabDrop API is running' });
+});
 app.use('/health', testRouter);
 app.use('/drop', uploadRouter);
 app.use('/download', downloadRouter);
